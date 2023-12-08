@@ -27,10 +27,10 @@ class Map:
 		return "source :" + self.pair_range_source.__repr__() + "\ndestination :" + self.pair_range_destination.__repr__()
 
 def find_overlap(range1, range2):
-	if range1.start > range2.end or range2.end < range1.start:
+	if range1.start > range2.end or range2.start > range1.end:
 		return None
 
-	return Pair_Range(max(range1.start, range2.start), min(range1.end, range2.end) - max(range1.start, range2.start))
+	return Pair_Range(max(range1.start, range2.start), min(range1.end, range2.end), ending_value = True)
 
 def remove_overlap(_range, overlap):
 
@@ -46,7 +46,7 @@ def remove_overlap(_range, overlap):
 	return [Pair_Range(_range.start, overlap.start - 1, ending_value = True), Pair_Range(overlap.end + 1, _range.end, ending_value = True)]
 
 def is_overlap(range1, range2):
-	return not(range1.start > range2.end or range2.end < range1.start)
+	return not(range1.start > range2.end or range1.end < range2.start)
 
 def remove_overlaps(ranges, overlaps):
 
@@ -83,14 +83,6 @@ def transform(maps, source_ranges):
 				result.append(_map.map(overlap))
 				overlap_found.append(overlap)
 
-	print(source_ranges)
-
-	print(overlap_found)
-
-	print(maps)
-
-	assert(1 != 1)
-
 	for overlap in overlap_found:
 
 		temp = []
@@ -98,17 +90,16 @@ def transform(maps, source_ranges):
 		for unmap_value in unmap_values:
 			if is_overlap(unmap_value, overlap):
 				without_overlap = remove_overlap(unmap_value, overlap)
+
 				temp += without_overlap
 			else:
 				temp.append(unmap_value)
-
-		print(temp)
 
 		unmap_values = temp
 
 	return result + unmap_values
 
-with open("test", "r") as file:
+with open("input", "r") as file:
 	data = file.readlines()
 
 seeds = list(map(int, data[0].split(": ")[1].split()))
@@ -141,8 +132,8 @@ min_location = -1
 
 source_ranges = seeds_range
 
-for maps in mapped_values:
-
+for i in range(len(mapped_values)):
+	maps = mapped_values[i]
 	source_ranges = transform(maps, source_ranges)
 
 print(min(source_ranges, key = lambda x: x.start).start)
