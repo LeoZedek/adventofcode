@@ -14,8 +14,8 @@ for i in range(0, len(data), 4):
 	ay = int(re.search(r'Y\+\d+', Aline).group()[2:])
 	bx = int(re.search(r'X\+\d+', Bline).group()[2:])
 	by = int(re.search(r'Y\+\d+', Bline).group()[2:])
-	totalx = int(re.search(r'X=\d+', Totalline).group()[2:])
-	totaly = int(re.search(r'Y=\d+', Totalline).group()[2:])
+	totalx = int(re.search(r'X=\d+', Totalline).group()[2:]) + 10000000000000
+	totaly = int(re.search(r'Y=\d+', Totalline).group()[2:]) + 10000000000000
 
 	b = (totalx * ay - totaly * ax) / ((bx * ay) - (by * ax))
 	a = (totalx - b * bx) / ax
