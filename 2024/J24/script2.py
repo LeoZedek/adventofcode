@@ -1,13 +1,8 @@
+from pyvis.network import Network
+
 AND = 0
 OR = 1
 XOR = 2
-
-class InitGate:
-	def __init__(self, value):
-		self.value = value
-
-	def get_value(self):
-		return self.value
 
 class Gate:
 	def __init__(self, _id, gate1Id, gate2Id, operator):
@@ -31,14 +26,21 @@ class Gate:
 		else:
 			return value1 ^ value2
 
+net = Network(notebook = True, cdn_resources = "remote",
+                bgcolor = "#222222",
+                font_color = "white",
+                height = "750px",
+                width = "100%",
+                directed= True
+)
+
 gates = {}
-gates_z = []
 
 with open('input') as file:
 	line = file.readline().strip()
 	while line != '':
 		gate, value =  line.split(': ')
-		gates[gate] = InitGate(bool(int(value)))
+		net.add_node(gate, shape = 'box', color='blue')
 		line = file.readline().strip()
 
 	line = file.readline().strip()
@@ -46,23 +48,21 @@ with open('input') as file:
 		operation, gateId = line.split(' -> ')
 		gateInput1Id, operator, gateInput2Id = operation.split(' ')
 
-		operator = {
-			'AND': AND,
-			'OR': OR,
-			'XOR': XOR
-		}[operator]
+		net.add_node(gateId, shape='circle', color={
+			'AND': 'red',
+			'OR': 'green',
+			'XOR': 'gray'
+			}[operator])
 
-		if gateId[0] == 'z':
-			gates_z.append(Gate(gateId, gateInput1Id, gateInput2Id, operator))
-		else:
-			gates[gateId] = Gate(gateId, gateInput1Id, gateInput2Id, operator)
+		
+		gates[gateId] = Gate(gateId, gateInput1Id, gateInput2Id, operator)
 
 		line = file.readline().strip()
 
-gates_z.sort(reverse = True, key = lambda x : x.id)
+for gateId, gate in gates.items():
+	net.add_edge(gate.gate1Id, gateId)
+	net.add_edge(gate.gate2Id, gateId)
 
-binary_result = []
-for gate in gates_z:
-	binary_result.append({False: '0', True: '1'}[gate.get_value()])
+net.show("graph.html")
 
-print(int(''.join(binary_result), 2))
+print(','.join(sorted(['z07', 'vmv', 'z20', 'kfm', 'tqr', 'hth', 'z28', 'hnv'])))
